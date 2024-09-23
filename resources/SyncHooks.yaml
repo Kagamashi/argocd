@@ -1,0 +1,18 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+  name: migrate-database
+spec:
+  template:
+    spec:
+      containers:
+        - name: migrate
+          image: my-database-migration-image
+      restartPolicy: OnFailure
+
+# sync waves control the order in which resources are applied within the sync phase
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
