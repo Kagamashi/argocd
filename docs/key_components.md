@@ -1,7 +1,8 @@
 ### ArgoCD Architecture Overview
 
 #### 1. **API Server**
-The **API Server** is the primary interface through which users interact with ArgoCD. It serves as the entry point for all user commands and actions.
+gRPC/REST server which exposes API consumed by Web UI, CLI, and CI/CD systems
+It serves as the entry point for all user commands and actions.
 - **Interfaces**: Provides both a REST API and CLI for managing and monitoring applications.
 - **Web UI**: Hosts the ArgoCD web user interface (UI) for easy user interaction.
 - **Authentication and Access Control**: Handles user authentication and enforces access control through Role-Based Access Control (RBAC).
@@ -11,7 +12,7 @@ When users issue commands (via CLI or UI), they pass through the API Server, whi
 ---
 
 #### 2. **Repository Server**
-The **Repository Server** manages Git repository content and ensures that ArgoCD has access to the desired application configuration.
+Internal service which maintains local cache of Git repository holding app manifests.
 - **Fetching Manifests**: Retrieves application manifests (YAML files) from configured Git repositories.
 - **Caching**: Parses and caches these manifests for faster access by other ArgoCD components.
 - **Validation**: Validates the structure of the repository and retrieves the current state of applications from Git.
@@ -21,7 +22,8 @@ Whenever ArgoCD needs to sync or validate the state of an application, the **Rep
 ---
 
 #### 3. **Application Controller**
-The **Application Controller** is responsible for maintaining the desired state of applications, as defined in Git, in the live Kubernetes cluster.
+Kubernetes controller which continuously monitors running applications and compares the current, live state against desired target state (as specified in repo).
+It detects OutOfSync app state and optionally takes corrective action.
 - **State Reconciliation**: Continuously watches both the Git repository and Kubernetes cluster, comparing the desired state (in Git) with the live state (in Kubernetes).
 - **Sync Operations**: When a difference is detected, the controller triggers sync operations to align the actual Kubernetes state with the desired state from Git.
 - **Health Management**: Monitors the health of applications, ensuring that resources remain in sync and reporting any errors.
